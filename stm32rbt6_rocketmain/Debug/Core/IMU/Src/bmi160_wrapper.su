@@ -1,0 +1,7 @@
+../Core/IMU/Src/bmi160_wrapper.c:50:8:BMI160_init	24	static
+../Core/IMU/Src/bmi160_wrapper.c:134:8:start_foc	16	static
+../Core/IMU/Src/bmi160_wrapper.c:155:8:bmi160ReadAccelGyro	48	static
+../Core/IMU/Src/bmi160_wrapper.c:185:6:set_bmi160_Ares	4	static
+../Core/IMU/Src/bmi160_wrapper.c:204:6:set_bmi160_Gres	4	static
+../Core/IMU/Src/bmi160_wrapper.c:226:6:get_bmi160_Ares	4	static
+../Core/IMU/Src/bmi160_wrapper.c:248:6:get_bmi160_Gres	4	static

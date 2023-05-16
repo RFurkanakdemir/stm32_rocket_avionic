@@ -1,0 +1,4 @@
+../Core/IMU/Src/common_porting.c:18:6:DelayUs	24	static
+../Core/IMU/Src/common_porting.c:31:6:bmi160_delay_us	24	static
+../Core/IMU/Src/common_porting.c:51:8:SensorAPI_I2Cx_Read	32	static
+../Core/IMU/Src/common_porting.c:66:8:SensorAPI_I2Cx_Write	32	static

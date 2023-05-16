@@ -1,0 +1,4 @@
+../Core/LoRa/Src/lora_lib.c:17:9:check_sum_hesapla	24	static
+../Core/LoRa/Src/lora_lib.c:28:6:veriPaketle	16	static
+../Core/LoRa/Src/lora_lib.c:34:6:verileriYolla	24	static
+../Core/LoRa/Src/lora_lib.c:43:6:initDataPaket	16	static
