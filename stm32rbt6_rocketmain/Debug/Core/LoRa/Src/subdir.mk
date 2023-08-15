@@ -18,13 +18,13 @@ C_DEPS += \
 
 
 # Each subdirectory must supply rules for building sources it contributes
-Core/LoRa/Src/%.o Core/LoRa/Src/%.su: ../Core/LoRa/Src/%.c Core/LoRa/Src/subdir.mk
-	arm-none-eabi-gcc "$<" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I"C:/Users/rfrkn/Desktop/Stm32_examples/stm32rbt6_rocketmain/Core/filter/Inc" -I"C:/Users/rfrkn/Desktop/Stm32_examples/stm32rbt6_rocketmain/Core/LoRa/Inc" -I"C:/Users/rfrkn/Desktop/Stm32_examples/stm32rbt6_rocketmain/Core/Presssure/Inc" -I"C:/Users/rfrkn/Desktop/Stm32_examples/stm32rbt6_rocketmain/Core/IMU/Inc" -I"C:/Users/rfrkn/Desktop/Stm32_examples/stm32rbt6_rocketmain/Core/GPS/Inc" -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfloat-abi=soft -mthumb -o "$@"
+Core/LoRa/Src/%.o Core/LoRa/Src/%.su Core/LoRa/Src/%.cyclo: ../Core/LoRa/Src/%.c Core/LoRa/Src/subdir.mk
+	arm-none-eabi-gcc "$<" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I"C:/Users/rfrkn/Desktop/Stm32_examples/stm32rbt6_rocketmain/Core/filter/Inc" -I"C:/Users/rfrkn/Desktop/Stm32_examples/stm32rbt6_rocketmain/Core/LoRa/Inc" -I"C:/Users/rfrkn/Desktop/Stm32_examples/stm32rbt6_rocketmain/Core/Presssure/Inc" -I"C:/Users/rfrkn/Desktop/Stm32_examples/stm32rbt6_rocketmain/Core/IMU/Inc" -I"C:/Users/rfrkn/Desktop/Stm32_examples/stm32rbt6_rocketmain/Core/GPS/Inc" -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"$(@:%.o=%.d)" -MT"$@" --specs=nano.specs -mfloat-abi=soft -mthumb -o "$@"
 
 clean: clean-Core-2f-LoRa-2f-Src
 
 clean-Core-2f-LoRa-2f-Src:
-	-$(RM) ./Core/LoRa/Src/E32Lora.d ./Core/LoRa/Src/E32Lora.o ./Core/LoRa/Src/E32Lora.su ./Core/LoRa/Src/lora_lib.d ./Core/LoRa/Src/lora_lib.o ./Core/LoRa/Src/lora_lib.su
+	-$(RM) ./Core/LoRa/Src/E32Lora.cyclo ./Core/LoRa/Src/E32Lora.d ./Core/LoRa/Src/E32Lora.o ./Core/LoRa/Src/E32Lora.su ./Core/LoRa/Src/lora_lib.cyclo ./Core/LoRa/Src/lora_lib.d ./Core/LoRa/Src/lora_lib.o ./Core/LoRa/Src/lora_lib.su
 
 .PHONY: clean-Core-2f-LoRa-2f-Src
 

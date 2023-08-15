@@ -58,6 +58,12 @@ default.size.stdout \
 OBJDUMP_LIST += \
 stm32rbt6_rocketmain.list \
 
+OBJCOPY_HEX += \
+stm32rbt6_rocketmain.hex \
+
+OBJCOPY_BIN += \
+stm32rbt6_rocketmain.bin \
+
 
 # All Target
 all: main-build
@@ -81,12 +87,22 @@ stm32rbt6_rocketmain.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_
 	@echo 'Finished building: $@'
 	@echo ' '
 
+stm32rbt6_rocketmain.hex: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O ihex $(EXECUTABLES) "stm32rbt6_rocketmain.hex"
+	@echo 'Finished building: $@'
+	@echo ' '
+
+stm32rbt6_rocketmain.bin: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-objcopy  -O binary $(EXECUTABLES) "stm32rbt6_rocketmain.bin"
+	@echo 'Finished building: $@'
+	@echo ' '
+
 # Other Targets
 clean:
-	-$(RM) default.size.stdout stm32rbt6_rocketmain.elf stm32rbt6_rocketmain.list stm32rbt6_rocketmain.map
+	-$(RM) default.size.stdout stm32rbt6_rocketmain.bin stm32rbt6_rocketmain.elf stm32rbt6_rocketmain.hex stm32rbt6_rocketmain.list stm32rbt6_rocketmain.map
 	-@echo ' '
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
+secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST) $(OBJCOPY_HEX) $(OBJCOPY_BIN)
 
 fail-specified-linker-script-missing:
 	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'

@@ -1,4 +1,4 @@
 ../Core/Presssure/Src/bmp3_wrapper.c:18:8:BMP390_init	24	static
-../Core/Presssure/Src/bmp3_wrapper.c:72:8:BMP390_get_pin_settings	24	static
-../Core/Presssure/Src/bmp3_wrapper.c:100:8:BMP390_get_pin_status	24	static
-../Core/Presssure/Src/bmp3_wrapper.c:109:8:BMP390_get_data	72	static
+../Core/Presssure/Src/bmp3_wrapper.c:80:8:BMP390_get_pin_settings	24	static
+../Core/Presssure/Src/bmp3_wrapper.c:108:8:BMP390_get_pin_status	24	static
+../Core/Presssure/Src/bmp3_wrapper.c:117:8:BMP390_get_data	72	static

@@ -27,23 +27,31 @@ int8_t BMP390_init(BMP390_t *DataStruct){
 	dev.intf = BMP3_I2C_INTF; //+
 	dev.read = SensorAPI_I2Cx_Read_bmp;
 	dev.write = SensorAPI_I2Cx_Write_bmp;
+	snc= bmp3_soft_reset(&dev);
+	HAL_Delay(300);
 
 	snc = bmp3_init(&dev);
-	HAL_Delay(500);
+	HAL_Delay(400);
+
 	if (snc==BMP3_OK)
 	{
 
-
+//dursun
 		settings.int_settings.drdy_en = BMP3_ENABLE;
 		settings.press_en = BMP3_ENABLE;
 		settings.temp_en = BMP3_ENABLE;
-
-		settings.odr_filter.press_os = BMP3_OVERSAMPLING_2X;
+		//dursun
 		settings.odr_filter.temp_os = BMP3_OVERSAMPLING_2X;
-		settings.odr_filter.odr = BMP3_ODR_100_HZ;
+
+		settings.odr_filter.press_os = BMP3_OVERSAMPLING_4X;
+
+		settings.odr_filter.iir_filter= BMP3_IIR_FILTER_COEFF_3;
+
+		settings.odr_filter.odr = BMP3_ODR_50_HZ;
+
+		settings.op_mode = BMP3_MODE_NORMAL;
 		HAL_Delay(200);
-		settings_sel = BMP3_SEL_PRESS_EN | BMP3_SEL_TEMP_EN | BMP3_SEL_PRESS_OS | BMP3_SEL_TEMP_OS | BMP3_SEL_ODR |
-		                   BMP3_SEL_DRDY_EN;
+		settings_sel = BMP3_SEL_PRESS_EN |BMP3_SEL_IIR_FILTER | BMP3_SEL_TEMP_EN | BMP3_SEL_PRESS_OS | BMP3_SEL_TEMP_OS | BMP3_SEL_ODR;
 		snc = bmp3_set_sensor_settings(settings_sel, &settings, &dev);
 		HAL_Delay(500);
 
@@ -51,7 +59,7 @@ int8_t BMP390_init(BMP390_t *DataStruct){
 		{
 			settings.op_mode = BMP3_MODE_NORMAL;
 			snc= bmp3_set_op_mode(&settings, &dev);
-			HAL_Delay(5000);
+			HAL_Delay(4000);
 
 		}
 		else
@@ -113,7 +121,7 @@ int8_t BMP390_get_data(BMP390_t *DataStruct){
 
 	snc=bmp3_get_sensor_data(BMP3_PRESS_TEMP, &bmp390_data, &dev);
 	HAL_Delay(5);
-	if(i<10){
+	if(i<20){
 		//calculate altitude
 		pg=bmp390_data.pressure/101325;
 		x= ((-8.31432)*(-0.0065))/(9.80665*0.0289644);

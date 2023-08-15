@@ -34,13 +34,13 @@ enum BMI160_Gscale {
 };
 
 // Set sensor range. This is for hardware sensitivity
-uint8_t BMI160_Asens = AFS_8G;
-uint8_t BMI160_Gsens = GFS_250DPS;
+uint8_t BMI160_Asens = AFS_4G;
+uint8_t BMI160_Gsens = GFS_125DPS;
 
 // Specify correct scale for readings.
 // This is for post-reading calculations
 // If you want raw readings, just select _RAW
-uint8_t BMI160_Ascale = AFS_8G;
+uint8_t BMI160_Ascale = AFS_4G;
 uint8_t BMI160_Gscale = GFS_250DPS;
 
 uint8_t BMI160_Ascale_bit, BMI160_Gscale_bit;

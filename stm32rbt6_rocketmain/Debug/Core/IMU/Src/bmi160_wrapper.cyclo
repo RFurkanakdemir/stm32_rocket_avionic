@@ -1,0 +1,7 @@
+bmi160_wrapper.c:50:8:BMI160_init	1
+bmi160_wrapper.c:134:8:start_foc	1
+bmi160_wrapper.c:155:8:bmi160ReadAccelGyro	1
+bmi160_wrapper.c:185:6:set_bmi160_Ares	5
+bmi160_wrapper.c:204:6:set_bmi160_Gres	6
+bmi160_wrapper.c:226:6:get_bmi160_Ares	6
+bmi160_wrapper.c:248:6:get_bmi160_Gres	7

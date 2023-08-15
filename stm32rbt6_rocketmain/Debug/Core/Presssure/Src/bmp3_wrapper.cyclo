@@ -1,0 +1,4 @@
+bmp3_wrapper.c:18:8:BMP390_init	3
+bmp3_wrapper.c:80:8:BMP390_get_pin_settings	3
+bmp3_wrapper.c:108:8:BMP390_get_pin_status	1
+bmp3_wrapper.c:117:8:BMP390_get_data	4

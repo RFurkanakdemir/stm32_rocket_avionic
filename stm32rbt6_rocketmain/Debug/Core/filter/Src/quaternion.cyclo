@@ -1,0 +1,4 @@
+quaternion.c:5:6:quaternionInit	1
+quaternion.c:20:6:quaternionUpdate	2
+quaternion.c:94:6:quaternionEulerUpdate	1
+quaternion.c:106:6:quaternionEulerUpdateHeading	2

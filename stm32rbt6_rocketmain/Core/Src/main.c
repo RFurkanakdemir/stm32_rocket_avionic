@@ -168,14 +168,14 @@ uint64_t lastTime_u64 = 0;
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	int8_t error;
-	uint8_t newData_u8;
- 	uint8_t lrdly=0;
- 	uint8_t first_trig = 0;
+ 	uint8_t is_fly = 0;
  	uint8_t buz_delay=0;
  	uint8_t status=1;
- 	uint8_t birincil=0;
- 	uint8_t ikincil=0;
+ 	uint8_t first=0;
+ 	uint8_t second=0;
+ 	uint8_t status_lora = 0;
+ 	uint8_t buz_init = 0;
+ 	uint8_t error=0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -202,23 +202,7 @@ int main(void)
   MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  DWT_Init();	//timer init
 
-  //Init filter with predefined settings
-  LPFTwoPole_Init(&LPF_accel_x, LPF_TYPE_BESSEL, LPF_ACCEL_CTOFF_HZ, sample_time_sec_f32);
-  LPFTwoPole_Init(&LPF_accel_y, LPF_TYPE_BESSEL, LPF_ACCEL_CTOFF_HZ, sample_time_sec_f32);
-  LPFTwoPole_Init(&LPF_accel_z, LPF_TYPE_BESSEL, LPF_ACCEL_CTOFF_HZ, sample_time_sec_f32);
-
-  LPFTwoPole_Init(&LPF_gyro_x, LPF_TYPE_BESSEL, LPF_GYRO_CTOFF_HZ, sample_time_sec_f32);
-  LPFTwoPole_Init(&LPF_gyro_y, LPF_TYPE_BESSEL, LPF_GYRO_CTOFF_HZ, sample_time_sec_f32);
-  LPFTwoPole_Init(&LPF_gyro_z, LPF_TYPE_BESSEL, LPF_GYRO_CTOFF_HZ, sample_time_sec_f32);
-    //notch filter max euler salınımı bilinmeli
-  NotchFilterInit(&NF_gyro_x, NF_GYRO_CFREQ_HZ, NF_GYRO_NWDTH_HZ, sample_time_sec_f32);
-  NotchFilterInit(&NF_gyro_y, NF_GYRO_CFREQ_HZ, NF_GYRO_NWDTH_HZ, sample_time_sec_f32);
-  NotchFilterInit(&NF_gyro_z, NF_GYRO_CFREQ_HZ, NF_GYRO_NWDTH_HZ, sample_time_sec_f32);
-
-    //Init state estimators
-  quaternionInit(&quaternion_t, sample_time_us_f32);
   initFusionAHRS(&fusionBiasIMU1, &fusionAhrsIMU1, &AHRS_IMU1, sample_time_sec_f32);
 
   lwgps_init(&gps);
@@ -234,7 +218,7 @@ int main(void)
   HAL_Delay(50);
 
   // Lora'nın , var olan configini okuyoruz.*********************
-  uint8_t status_lora = HAL_UART_Transmit(&huart3, message, MESSAGE_LENGTH , 2000);
+  status_lora = HAL_UART_Transmit(&huart3, message, MESSAGE_LENGTH , 2000);
   status_lora = HAL_UART_Receive(&huart3,recv, RECV_LENTH,2000);//config oku
   HAL_Delay(50);
 
@@ -243,10 +227,13 @@ int main(void)
   HAL_GPIO_WritePin(M1_GPIO_Port, M1_Pin, GPIO_PIN_RESET);
   HAL_Delay(200);
 
-  HAL_UART_Receive_IT(&huart1, &gpsrx_data, 1);//uart1den gelen interruptları almak için
-  /* USER CODE END 2 */
   HAL_GPIO_WritePin(Buzzer_GPIO_Port, Buzzer_Pin, GPIO_PIN_SET);
-  buz_delay=HAL_GetTick();
+
+
+  HAL_UART_Receive_IT(&huart1, &gpsrx_data, 1);//uart1den gelen interruptları almak için
+
+  /* USER CODE END 2 */
+
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
@@ -255,78 +242,44 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-	  //timer_u64 =  micros();
-	  if(HAL_GetTick() - buz_delay >25000){
-		  HAL_GPIO_WritePin(Buzzer_GPIO_Port, Buzzer_Pin, GPIO_PIN_RESET);
+	  //buzzer reset for x sec
+	  if(buz_delay <254){
+		  buz_delay++;
 	  }
 
-	  if (  imu_t.INIT_OK_i8 != TRUE)
+	  if(buz_delay>250 && buz_init ==0){
+		  HAL_GPIO_WritePin(Buzzer_GPIO_Port, Buzzer_Pin, GPIO_PIN_RESET);
+		  buz_init=1;
+	  }
+
+	  // sensors okey?
+	  if (  imu_t.INIT_OK_i8 != TRUE && bmp_t.INIT_OK_i8 != TRUE)
 	  	 {
-	  	  	lastTime_u64 = timer_u64 = micros();
-
-
-
 	  	  	//x*******Read Data******
 	  	  	error=bmi160ReadAccelGyro(&imu_t);	//gyro verilerini oku (i2c1 kullanır)
 	  	  	error=BMP390_get_data(&bmp_t);//basınç oku (i2c2 kullanır)
 
-	  	  	/**************filter*/
-  	  	//Get accelerometer data in "g" and run LPF
-	/*  	  	accelLowPassFiltered_f32[0] = (LPFTwoPole_Update(&LPF_accel_x, imu_t.BMI160_Accel_f32[0]));
-	  	  	accelLowPassFiltered_f32[1] = (LPFTwoPole_Update(&LPF_accel_y, imu_t.BMI160_Accel_f32[1]));
-	  	  	accelLowPassFiltered_f32[2] = (LPFTwoPole_Update(&LPF_accel_z, imu_t.BMI160_Accel_f32[2]));
-
-	  	  	//Get gyro data in "deg/s" and run LPF
-	  	  	gyroLowPassFiltered_f32[0] = NotchFilter_Update(&NF_gyro_x, imu_t.BMI160_Gyro_f32[0]);
-	  	  	gyroLowPassFiltered_f32[1] = NotchFilter_Update(&NF_gyro_y, imu_t.BMI160_Gyro_f32[1]);
-	  	  	gyroLowPassFiltered_f32[2] = NotchFilter_Update(&NF_gyro_z, imu_t.BMI160_Gyro_f32[2]);
-
-	  	  	//Put gyro data into Notch Filter to flat-out any data in specific frequency band
-	  	  	gyroNotchFiltered_f32[0] = (LPFTwoPole_Update(&LPF_gyro_x, gyroLowPassFiltered_f32[0]));
-	  	  	gyroNotchFiltered_f32[1] = (LPFTwoPole_Update(&LPF_gyro_y, gyroLowPassFiltered_f32[1]));
-	  	  	gyroNotchFiltered_f32[2] = (LPFTwoPole_Update(&LPF_gyro_z, gyroLowPassFiltered_f32[2]));
-*/
-
-	  	/*	//Get state estimations, using quaternion and fusion-quaternion based estimators
-	  			quaternionUpdate(&quaternion_t, accelLowPassFiltered_f32[0], accelLowPassFiltered_f32[1], accelLowPassFiltered_f32[2],
-	  					gyroNotchFiltered_f32[0]*(M_PI/180.0f), gyroNotchFiltered_f32[1]*(M_PI/180.0f),
-	  						gyroNotchFiltered_f32[2]*(M_PI/180.0f));
-
-	  			getFusionAHRS_6DoF(&fusionBiasIMU1, &fusionAhrsIMU1, &AHRS_IMU1, accelLowPassFiltered_f32[0], accelLowPassFiltered_f32[1],
-	  					accelLowPassFiltered_f32[2], gyroNotchFiltered_f32[0]*(M_PI/180.0f), gyroNotchFiltered_f32[1]*(M_PI/180.0f),
-	  						gyroNotchFiltered_f32[2]*(M_PI/180.0f));
-*/				getFusionAHRS_6DoF(&fusionBiasIMU1, &fusionAhrsIMU1, &AHRS_IMU1, imu_t.BMI160_Accel_f32[0], imu_t.BMI160_Accel_f32[1],
+	  	  	getFusionAHRS_6DoF(&fusionBiasIMU1, &fusionAhrsIMU1, &AHRS_IMU1, imu_t.BMI160_Accel_f32[0], imu_t.BMI160_Accel_f32[1],
 		imu_t.BMI160_Accel_f32[2],imu_t.BMI160_Gyro_f32[0],imu_t.BMI160_Gyro_f32[1],imu_t.BMI160_Gyro_f32[2]);
 
-	  			newData_u8 = TRUE; //Set newData to high for activate UART printer(we are not use)
-
-
-	  	 }//timer if end
-
-
-
-
+	  	 }
+//fly trigger
+	  if(bmp_t.altitude>700){
+	  	  	  is_fly= 1;
+	  	 }
 
 //birincil patlama
-	  if (AHRS_IMU1.PITCH<-55 || AHRS_IMU1.PITCH > 55 || AHRS_IMU1.ROLL<-50 || AHRS_IMU1.ROLL > 50 ){
+	  if ((AHRS_IMU1.PITCH<-55 || AHRS_IMU1.PITCH > 55 || AHRS_IMU1.ROLL<-50 || AHRS_IMU1.ROLL > 50) && is_fly==1){
 
 	  		HAL_GPIO_WritePin(birincil_GPIO_Port,birincil_Pin,GPIO_PIN_SET);
-	  		birincil=1;
-
+	  		first=1;
 	  	}
 
-//ikincil patlama trigger
-	  	if(bmp_t.altitude>500){
-	  		first_trig= 1;
-	  		}
-
-
 //ikincil patlama
-//	  	HAL_GPIO_WritePin(ikincil_GPIO_Port, ikincil_Pin, GPIO_PIN_SET);
-	  	if(bmp_t.altitude<300 && first_trig == 1){
+	  	if(bmp_t.altitude<600 && is_fly == 1 && first ==1){
 
 	  		HAL_GPIO_WritePin(ikincil_GPIO_Port, ikincil_Pin, GPIO_PIN_SET);
-	  		ikincil=1;
+	  		second=1;
 
 	  	}
 
@@ -337,18 +290,16 @@ int main(void)
 	  		initDataPaket( &paket,  CURRENT_NODE );
 	  		variable.firstinit  = FALSE;
 	  		memset( &data , 0  , sizeof( dataStruct_t ) );
-	  		variable.telemTimer = micros();
-
-
+	  		variable.telemTimer = HAL_GetTick();
 	  	}
 
-	  if(birincil==1){
+	  if(first==1){
 		  status=2;
 	  }
-	  if(ikincil==1){
+	  if(second==1){
 		  status = 3;
 	  }
-	  if(birincil==1 && ikincil==1){
+	  if(first==1 && second==1){
 		  status=4;
 	  }
 
@@ -365,7 +316,7 @@ int main(void)
 	  data.angle=AHRS_IMU1.PITCH;
 	  data.gyro_x=imu_t.BMI160_Gyro_f32[0];
 	  data.gyro_y=imu_t.BMI160_Gyro_f32[1];
-	  data.gyro_z=AHRS_IMU1.PITCH;
+	  data.gyro_z=AHRS_IMU1.PITCH+5;
 	  data.irtifa = bmp_t.altitude;
 	  data.status=status;
 
@@ -376,9 +327,7 @@ int main(void)
 
 		  veriPaketle( &paket,  &data);
 	 	  verileriYolla( paket.u8_array , DATA_PKT_LENGTH );
-	 	  lrdly++;
 	 	  variable.telemTimer = HAL_GetTick();
-
 	 	 }
 
 

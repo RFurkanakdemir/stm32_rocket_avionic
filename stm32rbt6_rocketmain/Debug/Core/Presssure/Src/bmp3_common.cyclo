@@ -1,0 +1,3 @@
+bmp3_common.c:14:6:bmp3_delay_us	1
+bmp3_common.c:30:20:SensorAPI_I2Cx_Read_bmp	1
+bmp3_common.c:46:20:SensorAPI_I2Cx_Write_bmp	1

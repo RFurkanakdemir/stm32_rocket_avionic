@@ -1,0 +1,4 @@
+lora_lib.c:17:9:check_sum_hesapla	2
+lora_lib.c:28:6:veriPaketle	1
+lora_lib.c:34:6:verileriYolla	1
+lora_lib.c:43:6:initDataPaket	1
